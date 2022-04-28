@@ -31,6 +31,18 @@ defmodule PlateSlateWeb.Resolvers.Menu do
     end
   end
 
+  def update_item(_, %{input: %{id: id} = params}, _) do
+    item = PlateSlate.Menu.Item
+    |> PlateSlate.Repo.get!(id)
+
+    case Menu.update_item(item, params) do
+      {:error, changeset} ->
+        {:ok, %{errors: transform_errors(changeset)}}
+      {:ok, menu_item} ->
+        {:ok, %{menu_item: menu_item}}
+    end
+  end
+
   defp transform_errors(changeset) do
     changeset
     |> Ecto.Changeset.traverse_errors(&format_error/1)
