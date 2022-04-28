@@ -62,6 +62,47 @@ defmodule PlateSlateWeb.Schema.Mutation.CreateMenuTest do
     }
   end
 
+  @query """
+  mutation ($menuItem: MenuItemInput!) {
+    createMenuItem(input: $menuItem) {
+      errors { key message }
+      menuItem {
+        name
+        description
+        price
+      }
+    }
+  }
+  """
+  @tag :wip
+  test "createMenuItem field creates an item and a category" do
+    menu_item = %{
+      "name" => "French Dip",
+      "description" => "Roast beef, caramelized onions, horseradish, ...",
+      "price" =>  "5.75",
+      "categoryName" => "Cat",
+    }
+    conn = build_conn()
+    conn = post conn, "/api",
+      query: @query,
+      variables: %{"menuItem" => menu_item}
+
+    assert json_response(conn, 200) == %{
+      "data" => %{
+        "createMenuItem" => %{
+          "errors" => nil,
+          "menuItem" => %{
+            "name" => menu_item["name"],
+            "description" => menu_item["description"],
+            "price" => menu_item["price"]
+          }
+        }
+      }
+    }
+
+    assert %Menu.Category{} = Repo.get_by(Menu.Category, name: "Cat")
+  end
+
   test "creating a menu item with an existing name fails",
   %{category_id: category_id} do
     menu_item = %{

@@ -15,7 +15,7 @@ config :plate_slate, PlateSlateWeb.Endpoint,
   server: false
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :error
 
 # Configure your database
 config :plate_slate, PlateSlate.Repo,

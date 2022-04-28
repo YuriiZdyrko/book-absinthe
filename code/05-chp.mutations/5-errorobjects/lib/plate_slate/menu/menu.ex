@@ -195,8 +195,21 @@ defmodule PlateSlate.Menu do
 
   """
   def create_item(attrs \\ %{}) do
-    %Item{}
+    changeset = %Item{}
     |> Item.changeset(attrs)
+
+    changeset = case attrs[:category_name] do
+      nil -> changeset
+      name ->
+        changeset
+        |> Ecto.Changeset.put_assoc(:category,  %{
+          name: name,
+          description: ""
+        })
+    end
+    
+    changeset
+    |> IO.inspect()
     |> Repo.insert()
   end
 
