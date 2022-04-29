@@ -74,6 +74,21 @@ defmodule PlateSlateWeb.Schema do
       end
     end
 
+    field :new_order, :order do
+      config fn _, _info ->
+        {:ok, topic: "*"}
+      end
+
+      trigger [:place_order], topic: fn
+        %{order: order} -> ["*"]
+        _ -> []
+      end
+
+      resolve fn %{order: order}, _ , _ ->
+        {:ok, order}
+      end
+    end
+
     # Other fields
 
     field :new_order, :order do
