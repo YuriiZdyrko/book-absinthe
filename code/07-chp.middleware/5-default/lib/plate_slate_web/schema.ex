@@ -20,6 +20,12 @@ defmodule PlateSlateWeb.Schema do
   def middleware(middleware, _field, %{identifier: :mutation}) do
     middleware ++ [Middleware.ChangesetErrors]
   end
+  # middleware/3 function is called every time we get type of the schema! (very often, can't be relied on)
+  def middleware([{Absinthe.Middleware.MapGet, _}] = middleware, _field, %{identifier: field}) do
+     IO.inspect("setting up custom middleware  for field" <> inspect(field))
+     
+     [Middleware.PrintDuration] ++ middleware ++ [Middleware.PrintDuration]
+  end
   def middleware(middleware, _field, _object) do
     middleware
   end
@@ -34,7 +40,9 @@ defmodule PlateSlateWeb.Schema do
     field :menu_items, list_of(:menu_item) do
       arg :filter, :menu_item_filter
       arg :order, type: :sort_order, default_value: :asc
+      # middleware Middleware.PrintDuration
       resolve &Resolvers.Menu.menu_items/3
+      # middleware Middleware.PrintDuration
     end
 
     field :search, list_of(:search_result) do
